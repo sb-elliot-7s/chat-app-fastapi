@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from jose import jwt, JWTError
 from dataclasses import dataclass
 from .exceptions import AuthExceptions
@@ -11,7 +13,7 @@ def decode_token_decorator(func):
         try:
             return await func(*args, **kwargs)
         except jwt.ExpiredSignatureError:
-            raise AuthExceptions().token_exception
+            raise AuthExceptions().token_expired
         except JWTError:
             raise AuthExceptions().credentials_exception
 
@@ -24,7 +26,12 @@ class TokenService(TokenServiceInterface):
 
     async def encode_token(self, data: dict) -> str:
         payload = data.copy()
-        payload.update({'exp': self.CONFIGS.access_token_expire_minutes})
+        payload.update(
+            {
+                'exp': datetime.utcnow() + timedelta(
+                    minutes=self.CONFIGS.access_token_expire_minutes)
+            }
+        )
         __data = {
             'claims': payload,
             'key': self.CONFIGS.secret_key,

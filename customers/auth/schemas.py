@@ -10,4 +10,5 @@ class CreateCustomerSchema(BaseCustomerAccountSchema):
 
 
 class TokenSchema(BaseModel):
-    token: str
+    access_token: str
+    token_type: str

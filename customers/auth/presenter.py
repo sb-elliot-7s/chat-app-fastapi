@@ -24,7 +24,10 @@ class CustomerPresenter:
         customer = await self.__check(username=username, password=password)
         options = {'data': {'sub': customer.username}}
         token = await self.token_service.encode_token(**options)
-        return {'token': token}
+        return {
+            'access_token': token,
+            'token_type': 'bearer'
+        }
 
     async def sign_up(self, username: str, password: str):
         if await self.repository.receive_customer_by_username(username=username):

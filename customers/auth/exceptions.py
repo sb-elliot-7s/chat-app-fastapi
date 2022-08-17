@@ -7,7 +7,7 @@ class AuthExceptions:
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    token_exception = HTTPException(
+    token_expired = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail='Token expired'
     )
