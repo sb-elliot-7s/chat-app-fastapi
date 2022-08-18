@@ -1,3 +1,4 @@
+aiofiles==0.8.0
 alembic==1.8.1
 anyio==3.6.1
 asgiref==3.5.2
