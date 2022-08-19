@@ -10,7 +10,7 @@ class Customers(Base):
     __mapper_args__ = {"eager_defaults": True}
 
     id = Column(Integer, primary_key=True)
-    username = Column(String(length=200))
+    username = Column(String(length=200), unique=True)
     password = Column(String)
     bio = Column(String(length=255))
     is_active = Column(Boolean, default=True)
@@ -20,7 +20,7 @@ class Customers(Base):
         'CustomerImage',
         backref='customer',
         passive_deletes=True,
-        # lazy='joined'
+        lazy='joined'
     )
 
 
