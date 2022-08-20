@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     postgres_server: str
     postgres_port: int
 
+    profile_image_folder: str
+
     algorithm: str
     access_token_expire_minutes: int
 
