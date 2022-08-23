@@ -8,8 +8,8 @@ from ..schemas import UpdateCustomerSchema
 
 class ProfileRepositoriesInterface(ABC):
 
-    # @abstractmethod
-    # async def get_customer(self, customer_id: int): pass
+    @abstractmethod
+    async def get_customer(self, customer_id: int): pass
 
     @abstractmethod
     async def update_customer(self, customer_id: int, data: UpdateCustomerSchema):

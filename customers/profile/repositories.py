@@ -42,11 +42,11 @@ class ProfileRepositories(ProfileRepositoriesInterface):
         await self.session.execute(statement=stmt)
         await self.session.commit()
 
-    # async def get_customer(self, customer_id: int):
-    #     stmt = select(Customers) \
-    #         .where(Customers.id == customer_id)
-    #     result: AsyncResult = await self.session.execute(statement=stmt)
-    #     return result.scalars().first()
+    async def get_customer(self, customer_id: int):
+        stmt = select(Customers) \
+            .where(Customers.id == customer_id)
+        result = await self.session.execute(statement=stmt)
+        return result.scalars().first()
 
     async def __check_username_exists(self, username: str | None = None):
         if username:
@@ -64,8 +64,8 @@ class ProfileRepositories(ProfileRepositoriesInterface):
             .returning(Customers)
         _ = await self.session.execute(statement=upd_stmt)
         await self.session.commit()
-        return (await self.session.execute(
-            select(Customers).where(Customers.id == customer_id))).scalars().first()
+        customer = await self.get_customer(customer_id=customer_id)
+        return customer
 
     async def delete_customer(self, customer_id: int):
         stmt = delete(Customers) \
