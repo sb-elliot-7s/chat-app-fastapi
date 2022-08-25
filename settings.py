@@ -4,6 +4,9 @@ from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
+
+    base_url: str
+
     secret_key: str
 
     db_url: str

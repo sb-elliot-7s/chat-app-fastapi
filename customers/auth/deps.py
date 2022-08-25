@@ -18,6 +18,12 @@ async def get_option_presenter(session: AsyncSession = Depends(get_db_session)):
     }
 
 
+async def get_token_service_data():
+    yield {
+        'token_service': TokenService()
+    }
+
+
 response_data = {
     'login': {
         'path': '/login',
@@ -27,5 +33,11 @@ response_data = {
     'signup': {
         'path': '/signup',
         'status_code': status.HTTP_201_CREATED
+    },
+    'create_token': {
+        'path': '/receive_token',
+        'status_code': status.HTTP_201_CREATED,
+        'response_model': TokenSchema
     }
+
 }

@@ -11,6 +11,8 @@ from .schemas import UpdateCustomerSchema
 
 from .interfaces.profile_repositories_interface import ProfileRepositoriesInterface
 from .exceptions import ProfileExceptions
+import aiohttp
+from settings import get_settings
 
 
 @dataclass
@@ -56,6 +58,17 @@ class ProfileRepositories(ProfileRepositoriesInterface):
             if check_customer.first():
                 raise ProfileExceptions().username_exists
 
+    @staticmethod
+    async def __create_new_token(username: str):
+        async with aiohttp.ClientSession() as session:
+            options = {
+                'url': get_settings().base_url + '/auth/receive_token/',
+                'json': {'username': username}
+            }
+            async with session.post(**options) as response:
+                if response.status == 201:
+                    return await response.json()
+
     async def update_customer(self, customer_id: int, data: UpdateCustomerSchema):
         await self.__check_username_exists(username=data.username)
         upd_stmt = update(Customers) \
@@ -65,7 +78,9 @@ class ProfileRepositories(ProfileRepositoriesInterface):
         _ = await self.session.execute(statement=upd_stmt)
         await self.session.commit()
         customer = await self.get_customer(customer_id=customer_id)
-        return customer
+        if data.username:
+            return await self.__create_new_token(username=customer.username)
+        return {'detail': f'User {customer_id} updated'}
 
     async def delete_customer(self, customer_id: int):
         stmt = delete(Customers) \

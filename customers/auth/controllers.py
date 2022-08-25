@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
-from .schemas import CreateCustomerSchema
-from .presenter import CustomerPresenter
-from .deps import get_option_presenter, response_data
+from .schemas import CreateCustomerSchema, BaseCustomerAccountSchema
+from .presenter import CustomerPresenter, TokenPresenter
+from .deps import get_option_presenter, response_data, get_token_service_data
 
 auth_controllers = APIRouter(prefix='/auth', tags=['customers'])
 
@@ -23,3 +23,9 @@ async def login(
 ):
     return await CustomerPresenter(**option_presenter) \
         .login(username=form_data.username, password=form_data.password)
+
+
+@auth_controllers.post(**response_data.get('create_token'))
+async def get_token(username: BaseCustomerAccountSchema,
+                    token_data=Depends(get_token_service_data)):
+    return await TokenPresenter(**token_data).get_token(username=username.username)

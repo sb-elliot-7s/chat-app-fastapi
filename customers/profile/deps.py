@@ -37,7 +37,6 @@ response_data = {
     'update_customer': {
         'path': '/',
         'status_code': status.HTTP_200_OK,
-        'response_model': CustomerSchema
     },
     'delete_customer': {
         'path': '/',
