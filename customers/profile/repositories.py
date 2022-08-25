@@ -77,8 +77,8 @@ class ProfileRepositories(ProfileRepositoriesInterface):
             .returning(Customers)
         _ = await self.session.execute(statement=upd_stmt)
         await self.session.commit()
-        customer = await self.get_customer(customer_id=customer_id)
         if data.username:
+            customer = await self.get_customer(customer_id=customer_id)
             return await self.__create_new_token(username=customer.username)
         return {'detail': f'User {customer_id} updated'}
 
