@@ -4,6 +4,8 @@ from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
+    host: str
+    port: int
 
     base_url: str
 
