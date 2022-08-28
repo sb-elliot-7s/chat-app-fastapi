@@ -23,6 +23,9 @@ class Customers(Base):
         lazy='joined'
     )
 
+    def __repr__(self) -> str:
+        return f'Customer: {self.username}'
+
 
 class CustomerImage(Base):
     __tablename__ = 'customer_images'
@@ -31,3 +34,6 @@ class CustomerImage(Base):
     photo = Column(String)
 
     customer_id = Column(Integer, ForeignKey('customers.id', ondelete='CASCADE'))
+
+    def __repr__(self) -> str:
+        return f'Customer image: {self.photo} : {self.customer_id}'

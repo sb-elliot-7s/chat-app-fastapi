@@ -45,8 +45,7 @@ class ProfileRepositories(ProfileRepositoriesInterface):
         await self.session.commit()
 
     async def get_customer(self, customer_id: int):
-        stmt = select(Customers) \
-            .where(Customers.id == customer_id)
+        stmt = select(Customers).where(Customers.id == customer_id)
         result = await self.session.execute(statement=stmt)
         return result.scalars().first()
 
@@ -83,7 +82,6 @@ class ProfileRepositories(ProfileRepositoriesInterface):
         return {'detail': f'User {customer_id} updated'}
 
     async def delete_customer(self, customer_id: int):
-        stmt = delete(Customers) \
-            .where(Customers.id == customer_id)
+        stmt = delete(Customers).where(Customers.id == customer_id)
         _ = await self.session.execute(statement=stmt)
         await self.session.commit()
