@@ -5,7 +5,7 @@ from .states import StateHandler
 from .presenter import MessagePresenter
 from .repositories import MessageRepositories
 from database import get_db_session
-from .utils import get_last_messages, get_channel
+from .utils import last_messages, get_channel
 from .deps import response_data
 
 # from uuid import uuid4
@@ -76,18 +76,17 @@ async def chat(
         #     token=websocket.headers.get('token')
         # )
     await websocket.accept()
-    last_messages = await get_last_messages(
+    messages = await last_messages(
         presenter=presenter, limit=limit, offset=offset,
-        sender_id=sender_customer.id, channel_id=channel['id']
+        channel_id=channel['id']
     )
-    await websocket.send_json(data=last_messages)
+    await websocket.send_json(data=messages)
     try:
         while True:
             obj_data: dict = await websocket.receive_json()
-            await StateHandler(websocket=websocket).check_handle(
-                obj_data=obj_data, channel=channel,
-                presenter=presenter, sender_customer=sender_customer
-            )
+            await StateHandler(websocket=websocket, presenter=presenter) \
+                .check_handle(obj_data=obj_data, channel=channel,
+                              sender_customer=sender_customer)
     except WebSocketDisconnect:
         """send notification to other user that customer leave channel"""
         ...

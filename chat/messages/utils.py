@@ -51,9 +51,11 @@ async def create_channel(
     return await handler(**data)
 
 
-async def check_user_in_subscribes(customer_id: int, token: str):
+async def check_user_in_subscribes(
+        customer_id: int, channel_id: int, token: str
+):
     data = {
-        'url': f'/channels/check-user/{customer_id}',
+        'url': f'/channels/check-user/{customer_id}/channel/{channel_id}',
         'method': METHOD.GET.value,
         'status_code': 200,
         'headers': {'AUTHORIZATION': f'bearer {token}'}
@@ -61,12 +63,12 @@ async def check_user_in_subscribes(customer_id: int, token: str):
     return await handler(**data)
 
 
-async def get_last_messages(
+async def last_messages(
         presenter: MessagePresenter,
         limit: int,
         offset: int,
         channel_id: int,
-        sender_id: int
+        sender_id: int | None = None
 ):
     return [
         MessageSchema.from_orm_to_json(x)

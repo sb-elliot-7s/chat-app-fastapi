@@ -32,7 +32,10 @@ class MessageRepositories(MessageRepositoriesInterface):
             self, channel_id: int, customer_id: int | None, limit: int,
             offset: int
     ):
-        stmt = select(Message) \
+        stmt = select(Message)
+        if customer_id:
+            stmt = stmt.where(Message.from_customer_id == customer_id)
+        stmt = stmt \
             .where(Message.channel_id == channel_id) \
             .limit(limit) \
             .offset(offset) \

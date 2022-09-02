@@ -15,14 +15,14 @@ class MessageType(str, Enum):
 
 class StateHandler:
 
-    def __init__(self, websocket: WebSocket):
+    def __init__(self, websocket: WebSocket, presenter: MessagePresenter):
+        self.presenter = presenter
         self.websocket = websocket
 
     async def update_message(
-            self, updated_text: str, message_id: int,
-            presenter: MessagePresenter, customer_id: int
+            self, updated_text: str, message_id: int, customer_id: int
     ):
-        updated_message: dict = await presenter.update_message(
+        updated_message: dict = await self.presenter.update_message(
             message_id=message_id,
             customer_id=customer_id,
             updated_data=UpdateMessageSchema(text=updated_text)
@@ -31,10 +31,9 @@ class StateHandler:
         await self.websocket.send_json(data=json_updated_message)
 
     async def write_message(
-            self, text: str, receiver_id: int,
-            presenter: MessagePresenter, sender_id: int, channel_id: int
+            self, text: str, receiver_id: int, sender_id: int, channel_id: int
     ):
-        message: dict = await presenter.save_message(
+        message: dict = await self.presenter.save_message(
             from_customer_id=sender_id,
             message_data=CreateMessageSchema(
                 text=text, to_customer_id=receiver_id
@@ -52,24 +51,25 @@ class StateHandler:
         await self.websocket.send_json(data=data)
 
     async def check_handle(
-            self, obj_data: dict, channel: dict,
-            presenter: MessagePresenter, sender_customer
+            self, obj_data: dict, channel: dict, sender_customer
     ):
         message_type: str = obj_data['type']
         match message_type:
             case MessageType.CHAT.value:
                 if not await check_user_in_subscribes(
                         customer_id=sender_customer.id,
+                        channel_id=channel['id'],
                         token=self.websocket.headers.get('token')):
                     error: dict = MessageExceptions().not_subscribe_error
                     await self.websocket.send_json(data=error)
                 else:
                     text = obj_data['text']
-                    receiver_id = obj_data.get('receiver_id')
+                    receiver_id = obj_data['receiver_id']
                     await self.write_message(
                         channel_id=channel['id'],
-                        text=text, receiver_id=receiver_id,
-                        presenter=presenter, sender_id=sender_customer.id
+                        text=text,
+                        receiver_id=receiver_id,
+                        sender_id=sender_customer.id
                     )
             case MessageType.USER_TYPING.value:
                 await self.user_typing(sender_customer.username)
@@ -78,7 +78,7 @@ class StateHandler:
                 message_id = obj_data['message_id']
                 await self.update_message(
                     updated_text=updated_text,
-                    message_id=message_id, presenter=presenter,
+                    message_id=message_id,
                     customer_id=sender_customer.id
                 )
             case MessageType.READ.value:
