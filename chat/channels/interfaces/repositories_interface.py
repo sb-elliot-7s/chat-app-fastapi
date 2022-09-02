@@ -37,5 +37,7 @@ class ChannelRepositoriesInterface(ABC):
         pass
 
     @abstractmethod
-    async def check_if_user_in_subscribed(self, customer_id: int):
+    async def check_if_user_in_subscribed(
+            self, customer_id: int, channel_id: int
+    ):
         pass

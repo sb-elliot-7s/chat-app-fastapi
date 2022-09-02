@@ -89,11 +89,13 @@ class ChannelRepositories(ChannelRepositoriesInterface):
         await self.session.commit()
         return result.rowcount
 
-    async def check_if_user_in_subscribed(self, customer_id: int):
+    async def check_if_user_in_subscribed(
+            self, customer_id: int, channel_id: int
+    ):
         exists_stmt = select(Subscribers.id) \
             .select_from(Channel) \
             .join(Subscribers, Channel.id == Subscribers.channel_id) \
-            .where(Subscribers.channel_id == 4,
+            .where(Subscribers.channel_id == channel_id,
                    Subscribers.customer_id == customer_id)
         result: AsyncResult = await self.session.execute(statement=exists_stmt)
         return True if result.scalars().first() else False

@@ -24,14 +24,15 @@ async def unsubscribe(
         .unsubscribe(channel_id=channel_id, customer_id=customer.id)
 
 
-@channel_controllers.get(**response_data.get('check-user'))
+@channel_controllers.get(**response_data.get('check_user'))
 async def check_user(
-        # customer=Depends(get_customer),
-        customer_id:int,
+        customer_id: int,
+        channel_id: int,
         repository=Depends(get_repository_service)
 ):
     return await ChannelPresenter(**repository) \
-        .check_if_user_in_subscribed(customer_id=customer_id)
+        .check_if_user_in_subscribed(customer_id=customer_id,
+                                     channel_id=channel_id)
 
 
 @channel_controllers.get(**response_data.get('channels'))

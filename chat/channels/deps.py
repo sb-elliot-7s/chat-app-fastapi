@@ -50,8 +50,8 @@ response_data = {
         'status_code': status.HTTP_200_OK,
         'response_model': ChannelSchema
     },
-    'check-user': {
-        'path': '/check-user/{customer_id}',
+    'check_user': {
+        'path': '/check-user/{customer_id}/channel/{channel_id}',
         'status_code': status.HTTP_200_OK,
     }
 }
