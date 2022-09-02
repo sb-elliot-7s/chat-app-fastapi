@@ -15,9 +15,10 @@ class METHOD(Enum):
 
 async def handler(
         url: str, method: str, json_data: dict | None = None,
-        status_code: int = 200, headers: dict = None,
+        status_code: int = 200, headers: dict | None = None,
 ):
-    async with aiohttp.ClientSession() as session:
+    base_url: str = get_settings().base_url
+    async with aiohttp.ClientSession(base_url=base_url) as session:
         async with session.request(
                 url=url, method=method, json=json_data, headers=headers
         ) as response:
@@ -27,7 +28,7 @@ async def handler(
 
 async def get_channel(channel_slug: str):
     data = {
-        'url': get_settings().base_url + f'/channels/{channel_slug}',
+        'url': f'/channels/{channel_slug}',
         'method': METHOD.GET.value,
         'status_code': 200
     }
@@ -38,7 +39,7 @@ async def create_channel(
         channel_name: str, describe_info: str | None, token: str
 ):
     data = {
-        'url': get_settings().base_url + '/channels/',
+        'url': '/channels/',
         'method': METHOD.POST.value,
         'status_code': 201,
         'json_data': {
