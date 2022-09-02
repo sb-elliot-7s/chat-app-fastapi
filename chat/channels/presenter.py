@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from .channel_schemas import UpdateChannelSchema, CreateChannelSchema
-from .interfaces.channel_repositories_interface import \
+from .schemas import UpdateChannelSchema, CreateChannelSchema
+from .interfaces.repositories_interface import \
     ChannelRepositoriesInterface
 from .exceptions import ChannelExceptions
 

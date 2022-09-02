@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from ..channel_schemas import CreateChannelSchema, UpdateChannelSchema
+from ..schemas import CreateChannelSchema, UpdateChannelSchema
 
 
 class ChannelRepositoriesInterface(ABC):

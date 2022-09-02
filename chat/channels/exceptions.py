@@ -7,7 +7,8 @@ class ChannelExceptions:
         detail='Channel not found'
     )
 
-    def unsubscribe(self, customer_id: int, channel_id: int):
+    @staticmethod
+    def unsubscribe(customer_id: int, channel_id: int):
         return HTTPException(
             status_code=status.HTTP_200_OK,
             detail=f'Customer {customer_id} '

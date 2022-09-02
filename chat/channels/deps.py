@@ -1,9 +1,9 @@
 from fastapi import status, Depends
 from permissions import CustomerPermission
 from customers.auth.token_service import TokenService
-from .channel_schemas import ChannelSchema
+from .schemas import ChannelSchema
 from database import get_db_session
-from .channel_repositories import ChannelRepositories
+from .repositories import ChannelRepositories
 
 
 async def get_customer(

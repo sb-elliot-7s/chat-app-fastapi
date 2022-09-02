@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
-from .channel_presenter import ChannelPresenter
-from .channel_schemas import CreateChannelSchema, UpdateChannelSchema
-from .channel_deps import response_data, get_customer, get_repository_service
+from .presenter import ChannelPresenter
+from .schemas import CreateChannelSchema, UpdateChannelSchema
+from .deps import response_data, get_customer, get_repository_service
 
 channel_controllers = APIRouter(prefix='/channels', tags=['channels'])
 

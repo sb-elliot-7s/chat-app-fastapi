@@ -22,7 +22,7 @@ class ChannelSchema(CreateChannelSchema):
 
     online_customers: list[CustomerSchema]
     subscribers: list[CustomerSchema]
-    messages: list | None
+    # messages: list | None
 
     class Config:
         orm_mode = True

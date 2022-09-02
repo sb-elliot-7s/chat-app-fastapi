@@ -2,12 +2,12 @@ from dataclasses import dataclass
 
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncResult
 from sqlalchemy import select, insert, delete, update
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import subqueryload
 
-from .channel_schemas import CreateChannelSchema, UpdateChannelSchema
-from .channel_models import Channel, Subscribers
+from .schemas import CreateChannelSchema, UpdateChannelSchema
+from .models import Channel, Subscribers
 from .exceptions import ChannelExceptions
-from .interfaces.channel_repositories_interface import \
+from .interfaces.repositories_interface import \
     ChannelRepositoriesInterface
 
 
@@ -55,15 +55,15 @@ class ChannelRepositories(ChannelRepositoriesInterface):
             .where(Channel.slug == channel_slug,
                    Channel.owner_id == customer_id).values(
             slug=updated_data.channel_name,
-            **updated_data.dict(exclude_none=True))
+            **updated_data.dict(exclude_none=True)
+        )
         _ = await self.session.execute(statement=stmt)
         await self.session.commit()
 
     async def get_channel(self, channel_slug: str):
         stmt = select(Channel) \
-            .options(joinedload(Channel.messages)) \
-            .options(joinedload(Channel.online_customers)) \
-            .options(joinedload(Channel.subscribers)) \
+            .options(subqueryload(Channel.online_customers))\
+            .options(subqueryload(Channel.subscribers))\
             .where(Channel.slug == channel_slug)
         result: AsyncResult = await self.session.execute(statement=stmt)
         return result.scalars().first()

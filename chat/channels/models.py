@@ -1,7 +1,7 @@
 from sqlalchemy import Column, ForeignKey, String, Integer, DateTime, func
 from sqlalchemy.orm import relationship
 from database import Base
-from ..messages.message_models import Message
+from ..messages.models import Message
 
 
 class Subscribers(Base):
