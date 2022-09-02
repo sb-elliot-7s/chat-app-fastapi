@@ -41,3 +41,7 @@ class MessageSchema(CreateMessageSchema):
         json_encoders = {
             datetime: lambda d: d.strftime('%Y-%m-%d %H:%M')
         }
+
+    @classmethod
+    def from_orm_to_json(cls, model_obj):
+        return cls.from_orm(obj=model_obj).json()
