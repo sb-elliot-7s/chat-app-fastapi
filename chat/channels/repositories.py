@@ -62,8 +62,8 @@ class ChannelRepositories(ChannelRepositoriesInterface):
 
     async def get_channel(self, channel_slug: str):
         stmt = select(Channel) \
-            .options(subqueryload(Channel.online_customers))\
-            .options(subqueryload(Channel.subscribers))\
+            .options(subqueryload(Channel.online_customers)) \
+            .options(subqueryload(Channel.subscribers)) \
             .where(Channel.slug == channel_slug)
         result: AsyncResult = await self.session.execute(statement=stmt)
         return result.scalars().first()
@@ -88,3 +88,12 @@ class ChannelRepositories(ChannelRepositoriesInterface):
         result = await self.session.execute(statement=channel_subs_stmt)
         await self.session.commit()
         return result.rowcount
+
+    async def check_if_user_in_subscribed(self, customer_id: int):
+        exists_stmt = select(Subscribers.id) \
+            .select_from(Channel) \
+            .join(Subscribers, Channel.id == Subscribers.channel_id) \
+            .where(Subscribers.channel_id == 4,
+                   Subscribers.customer_id == customer_id)
+        result: AsyncResult = await self.session.execute(statement=exists_stmt)
+        return True if result.scalars().first() else False

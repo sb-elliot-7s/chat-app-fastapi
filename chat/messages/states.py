@@ -2,6 +2,8 @@ from enum import Enum
 from fastapi import WebSocket
 from .presenter import MessagePresenter
 from .schemas import UpdateMessageSchema, MessageSchema, CreateMessageSchema
+from .utils import check_user_in_subscribes
+from .exceptions import MessageExceptions
 
 
 class MessageType(str, Enum):
@@ -56,17 +58,21 @@ class StateHandler:
         message_type: str = obj_data['type']
         match message_type:
             case MessageType.CHAT.value:
-                text = obj_data['text']
-                receiver_id = obj_data.get('receiver_id')
-                await self.write_message(
-                    channel_id=channel['id'],
-                    text=text, receiver_id=receiver_id,
-                    presenter=presenter, sender_id=sender_customer.id
-                )
+                if not await check_user_in_subscribes(
+                        customer_id=sender_customer.id,
+                        token=self.websocket.headers.get('token')):
+                    error: dict = MessageExceptions().not_subscribe_error
+                    await self.websocket.send_json(data=error)
+                else:
+                    text = obj_data['text']
+                    receiver_id = obj_data.get('receiver_id')
+                    await self.write_message(
+                        channel_id=channel['id'],
+                        text=text, receiver_id=receiver_id,
+                        presenter=presenter, sender_id=sender_customer.id
+                    )
             case MessageType.USER_TYPING.value:
-                await self.user_typing(
-                    sender_username=sender_customer.username,
-                )
+                await self.user_typing(sender_customer.username)
             case MessageType.UPDATE.value:
                 updated_text = obj_data['text']
                 message_id = obj_data['message_id']

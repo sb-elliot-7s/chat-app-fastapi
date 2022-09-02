@@ -10,9 +10,9 @@ from alembic import context
 
 from database import Base
 from customers.auth.models import Customers, CustomerImage
-from chat.channels.channel_models import Channel, ChannelsCustomers, \
+from chat.channels.models import Channel, ChannelsCustomers, \
     Subscribers
-from chat.messages.message_models import Message, Image
+from chat.messages.models import Message, Image
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

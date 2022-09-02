@@ -47,5 +47,10 @@ class ChannelPresenter:
         result = await self.repository \
             .unsubscribe(customer_id=customer_id, channel_id=channel_id)
         if not result:
-            raise ChannelExceptions()\
+            raise ChannelExceptions() \
                 .unsubscribe(customer_id=customer_id, channel_id=channel_id)
+
+    async def check_if_user_in_subscribed(self, customer_id: int):
+        return await self.repository.check_if_user_in_subscribed(
+            customer_id=customer_id
+        )

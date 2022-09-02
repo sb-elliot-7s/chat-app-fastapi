@@ -3,6 +3,7 @@ from ..schemas import CreateChannelSchema, UpdateChannelSchema
 
 
 class ChannelRepositoriesInterface(ABC):
+
     @abstractmethod
     async def get_channels(self, customer_id: int, limit: int, offset: int):
         pass
@@ -33,4 +34,8 @@ class ChannelRepositoriesInterface(ABC):
 
     @abstractmethod
     async def unsubscribe(self, customer_id: int, channel_id: int):
+        pass
+
+    @abstractmethod
+    async def check_if_user_in_subscribed(self, customer_id: int):
         pass
