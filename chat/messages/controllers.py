@@ -13,6 +13,23 @@ from .deps import response_data
 message_controllers = APIRouter(prefix='/messages', tags=['messages'])
 
 
+@message_controllers.get(**response_data.get('my_messages_from_channels'))
+async def my_messages_from_channel(
+        channel_id: int,
+        session=Depends(get_db_session),
+        limit: int = 20, offset: int = 0,
+        customer=Depends(
+            CustomerPermission(token_service=TokenService()).get_current_user)
+):
+    presenter = MessagePresenter(MessageRepositories(session=session))
+    return await presenter.get_messages(
+        channel_id=channel_id,
+        customer_id=customer.id,
+        limit=limit,
+        offset=offset
+    )
+
+
 @message_controllers.delete(**response_data.get('delete_message'))
 async def delete_message(
         message_id: int, session=Depends(get_db_session),
@@ -31,8 +48,7 @@ async def get_message(
         customer=Depends(
             CustomerPermission(token_service=TokenService()).get_current_user)
 ):
-    presenter = MessagePresenter(
-        repository=MessageRepositories(session=session))
+    presenter = MessagePresenter(MessageRepositories(session=session))
     return await presenter \
         .get_message(message_id=message_id, customer_id=customer.id)
 
@@ -88,5 +104,4 @@ async def chat(
                 .check_handle(obj_data=obj_data, channel=channel,
                               sender_customer=sender_customer)
     except WebSocketDisconnect:
-        """send notification to other user that customer leave channel"""
         ...

@@ -4,6 +4,7 @@ from .presenter import MessagePresenter
 from .schemas import UpdateMessageSchema, MessageSchema, CreateMessageSchema
 from .utils import check_user_in_subscribes
 from .exceptions import MessageExceptions
+from .utils import last_messages
 
 
 class MessageType(str, Enum):
@@ -19,6 +20,17 @@ class StateHandler:
         self.presenter = presenter
         self.websocket = websocket
 
+    async def read_message(
+            self, channel_id: int, offset: int = 20, limit: int = 20
+    ):
+        messages = await last_messages(
+            presenter=self.presenter,
+            channel_id=channel_id,
+            offset=offset,
+            limit=limit,
+        )
+        await self.websocket.send_json(data=messages)
+
     async def update_message(
             self, updated_text: str, message_id: int, customer_id: int
     ):
@@ -27,11 +39,15 @@ class StateHandler:
             customer_id=customer_id,
             updated_data=UpdateMessageSchema(text=updated_text)
         )
-        json_updated_message = MessageSchema(**updated_message).json()
-        await self.websocket.send_json(data=json_updated_message)
+        if not updated_message:
+            return
+        else:
+            json_updated_message = MessageSchema(**updated_message).json()
+            await self.websocket.send_json(data=json_updated_message)
 
     async def write_message(
-            self, text: str, receiver_id: int, sender_id: int, channel_id: int
+            self, text: str, sender_id: int, channel_id: int,
+            receiver_id: int | None
     ):
         message: dict = await self.presenter.save_message(
             from_customer_id=sender_id,
@@ -63,8 +79,8 @@ class StateHandler:
                     error: dict = MessageExceptions().not_subscribe_error
                     await self.websocket.send_json(data=error)
                 else:
-                    text = obj_data['text']
-                    receiver_id = obj_data['receiver_id']
+                    text = obj_data.get('text')
+                    receiver_id = obj_data.get('receiver_id')
                     await self.write_message(
                         channel_id=channel['id'],
                         text=text,
@@ -74,12 +90,19 @@ class StateHandler:
             case MessageType.USER_TYPING.value:
                 await self.user_typing(sender_customer.username)
             case MessageType.UPDATE.value:
-                updated_text = obj_data['text']
-                message_id = obj_data['message_id']
+                updated_text = obj_data.get('text')
+                message_id = obj_data.get('message_id')
                 await self.update_message(
                     updated_text=updated_text,
                     message_id=message_id,
                     customer_id=sender_customer.id
                 )
             case MessageType.READ.value:
-                ...
+                offset = obj_data.get('offset')
+                limit = obj_data.get('limit')
+                data = {
+                    'channel_id': channel['id'],
+                    'offset': offset,
+                    'limit': limit
+                }
+                await self.read_message(**data)

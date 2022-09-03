@@ -21,7 +21,7 @@ class MessageRepositories(MessageRepositoriesInterface):
         options = {
             'channel_id': channel_id,
             'from_customer_id': from_customer_id,
-            **message_data.dict()
+            **message_data.dict(exclude_none=True)
         }
         stmt = insert(Message).values(**options).returning(Message)
         result: AsyncResult = await self.session.execute(statement=stmt)
