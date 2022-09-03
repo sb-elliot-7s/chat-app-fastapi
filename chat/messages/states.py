@@ -21,8 +21,7 @@ class StateHandler:
         self.websocket = websocket
 
     async def read_message(
-            self, channel_id: int, offset: int = 20, limit: int = 20
-    ):
+            self, channel_id: int, offset: int = 20, limit: int = 20):
         messages = await last_messages(
             presenter=self.presenter,
             channel_id=channel_id,
@@ -32,8 +31,7 @@ class StateHandler:
         await self.websocket.send_json(data=messages)
 
     async def update_message(
-            self, updated_text: str, message_id: int, customer_id: int
-    ):
+            self, updated_text: str, message_id: int, customer_id: int):
         updated_message: dict = await self.presenter.update_message(
             message_id=message_id,
             customer_id=customer_id,
@@ -67,8 +65,7 @@ class StateHandler:
         await self.websocket.send_json(data=data)
 
     async def check_handle(
-            self, obj_data: dict, channel: dict, sender_customer
-    ):
+            self, obj_data: dict, channel: dict, sender_customer):
         message_type: str = obj_data['type']
         match message_type:
             case MessageType.CHAT.value:

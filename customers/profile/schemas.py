@@ -19,7 +19,8 @@ class UpdateCustomerSchema(BaseModel):
 
     @classmethod
     def as_form(
-            cls, bio: str | None = Form(None), username: str | None = Form(None)
+            cls, bio: str | None = Form(None),
+            username: str | None = Form(None)
     ):
         return cls(bio=bio, username=username)
 

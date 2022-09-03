@@ -36,8 +36,7 @@ async def get_channel(channel_slug: str):
 
 
 async def create_channel(
-        channel_name: str, describe_info: str | None, token: str
-):
+        channel_name: str, describe_info: str | None, token: str):
     data = {
         'url': '/channels/',
         'method': METHOD.POST.value,
@@ -52,8 +51,7 @@ async def create_channel(
 
 
 async def check_user_in_subscribes(
-        customer_id: int, channel_id: int, token: str
-):
+        customer_id: int, channel_id: int, token: str):
     data = {
         'url': f'/channels/check-user/{customer_id}/channel/{channel_id}',
         'method': METHOD.GET.value,

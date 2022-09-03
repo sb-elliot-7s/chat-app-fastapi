@@ -77,7 +77,6 @@ async def update_channel(
 
 @channel_controllers.get(**response_data.get('channel'))
 async def get_channel(
-        channel_slug: str, repository=Depends(get_repository_service),
-):
+        channel_slug: str, repository=Depends(get_repository_service)):
     return await ChannelPresenter(**repository) \
         .get_channel(channel_slug=channel_slug)

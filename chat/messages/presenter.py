@@ -30,8 +30,7 @@ class MessagePresenter:
 
     async def get_message(self, message_id: int, customer_id: int):
         return await self.repository.get_message(
-            message_id=message_id, customer_id=customer_id
-        )
+            message_id=message_id, customer_id=customer_id)
 
     async def delete_message(self, message_id: int, customer_id: int):
         if not (result := await self.repository.delete_message(

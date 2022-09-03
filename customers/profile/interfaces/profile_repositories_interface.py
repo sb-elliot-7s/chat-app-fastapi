@@ -2,7 +2,8 @@ from abc import ABC, abstractmethod
 
 from fastapi import UploadFile
 
-from image_service.interfaces.image_service_interface import ImageServiceInterface
+from image_service.interfaces.image_service_interface import \
+    ImageServiceInterface
 from ..schemas import UpdateCustomerSchema
 
 
@@ -12,7 +13,8 @@ class ProfileRepositoriesInterface(ABC):
     async def get_customer(self, customer_id: int): pass
 
     @abstractmethod
-    async def update_customer(self, customer_id: int, data: UpdateCustomerSchema):
+    async def update_customer(
+            self, customer_id: int, data: UpdateCustomerSchema):
         pass
 
     @abstractmethod

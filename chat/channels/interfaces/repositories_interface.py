@@ -10,8 +10,7 @@ class ChannelRepositoriesInterface(ABC):
 
     @abstractmethod
     async def create_channel(
-            self, customer_id: int, channel_data: CreateChannelSchema
-    ):
+            self, customer_id: int, channel_data: CreateChannelSchema):
         pass
 
     @abstractmethod
@@ -38,6 +37,5 @@ class ChannelRepositoriesInterface(ABC):
 
     @abstractmethod
     async def check_if_user_in_subscribed(
-            self, customer_id: int, channel_id: int
-    ):
+            self, customer_id: int, channel_id: int):
         pass

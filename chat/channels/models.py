@@ -46,11 +46,9 @@ class Channel(Base):
     owner_id = Column(Integer, ForeignKey('customers.id', ondelete='CASCADE'))
     created = Column(DateTime, server_default=func.now())
     subscribers = relationship(
-        'Customers', backref='channels_subscribe', secondary='subscribers'
-    )
+        'Customers', backref='channels_subscribe', secondary='subscribers')
     online_customers = relationship(
-        'Customers', backref='channels', secondary='channels_customers'
-    )
+        'Customers', backref='channels', secondary='channels_customers')
     messages = relationship('Message', backref='channel', passive_deletes=True)
 
     def __repr__(self) -> str:

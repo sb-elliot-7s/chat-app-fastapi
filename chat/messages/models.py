@@ -27,8 +27,7 @@ class Message(Base):
     channel_id = Column(Integer, ForeignKey('channels.id', ondelete='CASCADE'))
 
     images = relationship(
-        'Image', backref='message', passive_deletes=True, lazy='joined'
-    )
+        'Image', backref='message', passive_deletes=True, lazy='joined')
 
     def __repr__(self) -> str:
         return f'Message: {self.text[:20]}'

@@ -44,8 +44,7 @@ class MessageRepositories(MessageRepositoriesInterface):
         return result.scalars().unique().all()
 
     async def get_message(self, message_id: int, customer_id: int):
-        stmt = select(Message) \
-            .where(Message.id == message_id)
+        stmt = select(Message).where(Message.id == message_id)
         result: AsyncResult = await self.session.execute(statement=stmt)
         return result.scalars().first()
 

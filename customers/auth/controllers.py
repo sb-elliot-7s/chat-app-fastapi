@@ -26,6 +26,9 @@ async def login(
 
 
 @auth_controllers.post(**response_data.get('create_token'))
-async def get_token(username: BaseCustomerAccountSchema,
-                    token_data=Depends(get_token_service_data)):
-    return await TokenPresenter(**token_data).get_token(username=username.username)
+async def get_token(
+        username: BaseCustomerAccountSchema,
+        token_data=Depends(get_token_service_data)
+):
+    return await TokenPresenter(**token_data) \
+        .get_token(username=username.username)

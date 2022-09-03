@@ -8,8 +8,6 @@ from database import get_db_session
 from .utils import last_messages, get_channel
 from .deps import response_data
 
-# from uuid import uuid4
-
 message_controllers = APIRouter(prefix='/messages', tags=['messages'])
 
 
@@ -53,23 +51,6 @@ async def get_message(
         .get_message(message_id=message_id, customer_id=customer.id)
 
 
-# @message_controllers.patch(**response_data.get('update'))
-# async def update_message(
-#         message_id: int,
-#         updated_data: UpdateMessageSchema,
-#         session=Depends(get_db_session),
-#         customer=Depends(
-#             CustomerPermission(token_service=TokenService()).get_current_user)
-# ):
-#     presenter = MessagePresenter(
-#         repository=MessageRepositories(session=session))
-#     return await presenter.update_message(
-#         message_id=message_id,
-#         customer_id=customer.id,
-#         updated_data=updated_data
-#     )
-
-
 @message_controllers.websocket(**response_data.get('ws_chat'))
 async def chat(
         channel_slug: str,
@@ -86,11 +67,6 @@ async def chat(
     channel = await get_channel(channel_slug=channel_slug)
     if channel is None:
         raise WebSocketDisconnect
-        # channel = await create_channel(
-        #     channel_name=str(uuid4()),
-        #     describe_info='some description',
-        #     token=websocket.headers.get('token')
-        # )
     await websocket.accept()
     messages = await last_messages(
         presenter=presenter, limit=limit, offset=offset,

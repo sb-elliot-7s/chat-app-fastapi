@@ -8,8 +8,10 @@ from passlib.context import CryptContext
 class PasswordService(PasswordServiceInterface):
     context: CryptContext
 
-    async def verify_password(self, plain_password: str,
-                              hashed_password: str) -> bool:
+    async def verify_password(
+            self, plain_password: str,
+            hashed_password: str
+    ) -> bool:
         return self.context.verify(secret=plain_password, hash=hashed_password)
 
     async def hashed_password(self, password: str) -> str:

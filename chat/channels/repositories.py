@@ -28,8 +28,7 @@ class ChannelRepositories(ChannelRepositoriesInterface):
         return result.scalars().all()
 
     async def create_channel(
-            self, customer_id: int, channel_data: CreateChannelSchema
-    ):
+            self, customer_id: int, channel_data: CreateChannelSchema):
         stmt = insert(Channel).values(
             owner_id=customer_id,
             slug=channel_data.channel_name,
@@ -90,8 +89,7 @@ class ChannelRepositories(ChannelRepositoriesInterface):
         return result.rowcount
 
     async def check_if_user_in_subscribed(
-            self, customer_id: int, channel_id: int
-    ):
+            self, customer_id: int, channel_id: int):
         exists_stmt = select(Subscribers.id) \
             .select_from(Channel) \
             .join(Subscribers, Channel.id == Subscribers.channel_id) \

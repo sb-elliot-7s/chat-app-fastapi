@@ -6,8 +6,7 @@ class MessageRepositoriesInterface(ABC):
 
     @abstractmethod
     async def save_message(
-            self, from_customer_id: int,
-            message_data: CreateMessageSchema,
+            self, from_customer_id: int, message_data: CreateMessageSchema,
             channel_id: int,
     ):
         pass

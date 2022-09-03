@@ -12,8 +12,7 @@ class TokenPresenter(CreateTokenMixin):
 
     async def get_token(self, username: str) -> dict:
         return await self.create_token(
-            username=username, token_service=self.token_service
-        )
+            username=username, token_service=self.token_service)
 
 
 @dataclass
@@ -35,8 +34,7 @@ class CustomerPresenter(CreateTokenMixin):
     async def login(self, username: str, password: str):
         customer = await self.__check(username=username, password=password)
         return await self.create_token(
-            username=customer.username, token_service=self.token_service
-        )
+            username=customer.username, token_service=self.token_service)
 
     async def sign_up(self, username: str, password: str):
         if await self.repository.receive_customer_by_username(username=username):

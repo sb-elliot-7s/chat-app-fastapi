@@ -16,8 +16,7 @@ class ProfilePresenter:
 
     async def update_customer(self, customer_id: int, data: UpdateCustomerSchema):
         return await self.repositories.update_customer(
-            customer_id=customer_id, data=data,
-        )
+            customer_id=customer_id, data=data)
 
     async def delete_customer(self, customer_id: int):
         return await self.repositories.delete_customer(customer_id=customer_id)
