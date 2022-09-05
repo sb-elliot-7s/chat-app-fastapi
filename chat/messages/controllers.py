@@ -7,8 +7,19 @@ from .repositories import MessageRepositories
 from database import get_db_session
 from .utils import last_messages, get_channel
 from .deps import response_data
+from .elastic_client import MessageElasticService, ElasticClient
+from .schemas import SearchMessageSchema
+from settings import get_settings
 
 message_controllers = APIRouter(prefix='/messages', tags=['messages'])
+
+
+@message_controllers.post('/search')
+def search_messages(data: SearchMessageSchema):
+    es_client = ElasticClient(hosts=get_settings().elastic_host).client
+    es_service = MessageElasticService(client=es_client)
+    response = es_service.search(message_text=data.text)
+    return response.to_dict().get('hits').get('hits')
 
 
 @message_controllers.get(**response_data.get('my_messages_from_channels'))

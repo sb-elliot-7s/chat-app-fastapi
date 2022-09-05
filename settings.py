@@ -23,6 +23,8 @@ class Settings(BaseSettings):
     algorithm: str
     access_token_expire_minutes: int
 
+    elastic_host: str
+
     class Config:
         env_file = '.env'
         env_file_encoding = 'utf-8'

@@ -16,7 +16,11 @@ class MessageImageSchema(BaseModel):
         }
 
 
-class UpdateMessageSchema(BaseModel):
+class SearchMessageSchema(BaseModel):
+    text: str
+
+
+class UpdateMessageSchema(SearchMessageSchema):
     text: str
 
 

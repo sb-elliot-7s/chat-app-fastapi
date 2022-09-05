@@ -5,6 +5,8 @@ from .schemas import UpdateMessageSchema, MessageSchema, CreateMessageSchema
 from .utils import check_user_in_subscribes
 from .exceptions import MessageExceptions
 from .utils import last_messages
+from settings import get_settings
+from .elastic_client import MessageElasticService, ElasticClient
 
 
 class MessageType(str, Enum):
@@ -43,6 +45,18 @@ class StateHandler:
             json_updated_message = MessageSchema(**updated_message).json()
             await self.websocket.send_json(data=json_updated_message)
 
+    @staticmethod
+    def save_message_to_elastic(message: dict):
+        client = ElasticClient(hosts=get_settings().elastic_host).client
+        es_service = MessageElasticService(client=client)
+        es_service.save_message(
+            _id=message['id'],
+            text=message['text'],
+            from_customer_id=message['from_customer_id'],
+            to_customer_id=message['to_customer_id'],
+            channel_id=message['channel_id']
+        )
+
     async def write_message(
             self, text: str, sender_id: int, channel_id: int,
             receiver_id: int | None
@@ -54,6 +68,7 @@ class StateHandler:
             ),
             channel_id=channel_id
         )
+        self.save_message_to_elastic(message=message)
         json_message = MessageSchema(**message).json()
         await self.websocket.send_json(data=json_message)
 
