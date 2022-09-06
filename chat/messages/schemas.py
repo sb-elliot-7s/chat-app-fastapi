@@ -17,6 +17,7 @@ class MessageImageSchema(BaseModel):
 
 
 class SearchMessageSchema(BaseModel):
+    channel_id: int | None
     text: str
 
 

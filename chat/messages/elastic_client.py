@@ -40,6 +40,8 @@ class MessageSearchElastic(MessageSearchElasticInterface):
     def search(self, options: SearchMessageSchema) -> Response:
         searched = Search(using=self.client, index=self.index) \
             .query('match', text=options.text)
+        if options.channel_id:
+            searched = searched.filter('term', channel_id=options.channel_id)
         response: Response = searched.execute()
         return response
 
