@@ -1,10 +1,11 @@
 from elasticsearch_dsl import Search, Document, Date, Boolean, Text, Integer
-from datetime import datetime
 from functools import wraps
 
 from elasticsearch_dsl.connections import connections
 from elasticsearch_dsl.response import Response
 from fastapi import HTTPException, status
+from .interfaces.elastic_message_interface import MessageSearchElasticInterface
+from .schemas import SearchMessageSchema
 
 
 def object_exist_or_none(object_data: str):
@@ -31,33 +32,27 @@ class ElasticClient:
         document.init(using=self.client)
 
 
-class MessageElasticService:
-
+class MessageSearchElastic(MessageSearchElasticInterface):
     def __init__(self, client, index: str = 'message'):
-        self.client = client
         self.index = index
+        self.client = client
 
-    def search(self, message_text: str):
+    def search(self, options: SearchMessageSchema) -> Response:
         searched = Search(using=self.client, index=self.index) \
-            .query('match', text=message_text)
+            .query('match', text=options.text)
         response: Response = searched.execute()
         return response
 
+
+class MessageElasticService:
+
+    def __init__(self, client):
+        self.client = client
+
     @staticmethod
-    def save_message(
-            _id: int, text: str, from_customer_id: int,
-            to_customer_id: int, channel_id: int
-    ):
-        message = MessageDocument(
-            id=_id,
-            text=text,
-            from_customer_id=from_customer_id,
-            to_customer_id=to_customer_id,
-            channel_id=channel_id,
-            read=False,
-            is_active=True
-        )
-        message.meta.id = _id
+    def save_message(message_object: dict):
+        message = MessageDocument(**message_object)
+        message.meta.id = message_object.get('id')
         message.save()
 
     def delete_message(self, message_id: int):
@@ -92,8 +87,3 @@ class MessageDocument(Document):
 
     class Index:
         name = 'message'
-
-    def save(self, **kwargs):
-        self.created = datetime.utcnow()
-        self.updated = datetime.utcnow()
-        return super().save(**kwargs)

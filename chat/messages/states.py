@@ -49,13 +49,7 @@ class StateHandler:
     def save_message_to_elastic(message: dict):
         client = ElasticClient(hosts=get_settings().elastic_host).client
         es_service = MessageElasticService(client=client)
-        es_service.save_message(
-            _id=message['id'],
-            text=message['text'],
-            from_customer_id=message['from_customer_id'],
-            to_customer_id=message['to_customer_id'],
-            channel_id=message['channel_id']
-        )
+        es_service.save_message(message_object=message)
 
     async def write_message(
             self, text: str, sender_id: int, channel_id: int,

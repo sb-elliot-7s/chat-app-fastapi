@@ -2,11 +2,13 @@ from dataclasses import dataclass
 
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncResult
 from sqlalchemy import select, insert, delete, update
-from .schemas import CreateMessageSchema, UpdateMessageSchema
+from .schemas import CreateMessageSchema, UpdateMessageSchema, \
+    SearchMessageSchema
 from .models import Message
 
 from .interfaces.repositories_interface import \
-    MessageRepositoriesInterface
+    MessageRepositoriesInterface, MessageSearchInterface
+from .interfaces.elastic_message_interface import MessageSearchElasticInterface
 
 
 @dataclass
@@ -69,3 +71,11 @@ class MessageRepositories(MessageRepositoriesInterface):
         result: AsyncResult = await self.session.execute(statement=stmt)
         await self.session.commit()
         return result.first()
+
+
+class MessageSearchRepository(MessageSearchInterface):
+
+    def search_messages(self, options: SearchMessageSchema,
+                        receiver: MessageSearchElasticInterface):
+        response = receiver.search(options=options)
+        return response.to_dict().get('hits').get('hits')

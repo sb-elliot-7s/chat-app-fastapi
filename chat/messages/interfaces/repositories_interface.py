@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
-from ..schemas import CreateMessageSchema, UpdateMessageSchema
+from ..schemas import CreateMessageSchema, UpdateMessageSchema, \
+    SearchMessageSchema
+from .elastic_message_interface import MessageSearchElasticInterface
 
 
 class MessageRepositoriesInterface(ABC):
@@ -30,5 +32,13 @@ class MessageRepositoriesInterface(ABC):
     async def update_message(
             self, message_id: int, customer_id: int,
             updated_data: UpdateMessageSchema
+    ):
+        pass
+
+
+class MessageSearchInterface(ABC):
+    def search_messages(
+            self, options: SearchMessageSchema,
+            receiver: MessageSearchElasticInterface
     ):
         pass

@@ -1,8 +1,11 @@
 from dataclasses import dataclass
 
-from .interfaces.repositories_interface import MessageRepositoriesInterface
-from .schemas import CreateMessageSchema, UpdateMessageSchema
+from .interfaces.repositories_interface import MessageRepositoriesInterface, \
+    MessageSearchInterface
+from .schemas import CreateMessageSchema, UpdateMessageSchema, \
+    SearchMessageSchema
 from .exceptions import MessageExceptions
+from .interfaces.elastic_message_interface import MessageSearchElasticInterface
 
 
 @dataclass
@@ -47,3 +50,15 @@ class MessagePresenter:
             customer_id=customer_id,
             updated_data=updated_data
         )
+
+
+@dataclass
+class MessageSearchPresenter:
+    search_repository: MessageSearchInterface
+
+    def search_messages(
+            self, options: SearchMessageSchema,
+            receiver: MessageSearchElasticInterface,
+    ):
+        return self.search_repository.search_messages(
+            options=options, receiver=receiver)

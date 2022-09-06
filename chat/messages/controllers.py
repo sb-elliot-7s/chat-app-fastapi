@@ -2,35 +2,35 @@ from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 from permissions import CustomerPermission
 from customers.auth.token_service import TokenService
 from .states import StateHandler
-from .presenter import MessagePresenter
-from .repositories import MessageRepositories
-from database import get_db_session
 from .utils import last_messages, get_channel
-from .deps import response_data
-from .elastic_client import MessageElasticService, ElasticClient
+from .deps import response_data, get_presenter, get_message_search_presenter
 from .schemas import SearchMessageSchema
+from .elastic_client import MessageSearchElastic, ElasticClient
 from settings import get_settings
+from .presenter import MessageSearchPresenter
 
 message_controllers = APIRouter(prefix='/messages', tags=['messages'])
 
 
 @message_controllers.post('/search')
-def search_messages(data: SearchMessageSchema):
+def search_messages(
+        options: SearchMessageSchema,
+        search_presenter: MessageSearchPresenter = Depends(
+            get_message_search_presenter)
+):
     es_client = ElasticClient(hosts=get_settings().elastic_host).client
-    es_service = MessageElasticService(client=es_client)
-    response = es_service.search(message_text=data.text)
-    return response.to_dict().get('hits').get('hits')
+    receiver = MessageSearchElastic(client=es_client)
+    return search_presenter.search_messages(options=options, receiver=receiver)
 
 
 @message_controllers.get(**response_data.get('my_messages_from_channels'))
 async def my_messages_from_channel(
         channel_id: int,
-        session=Depends(get_db_session),
+        presenter=Depends(get_presenter),
         limit: int = 20, offset: int = 0,
         customer=Depends(
             CustomerPermission(token_service=TokenService()).get_current_user)
 ):
-    presenter = MessagePresenter(MessageRepositories(session=session))
     return await presenter.get_messages(
         channel_id=channel_id,
         customer_id=customer.id,
@@ -41,11 +41,11 @@ async def my_messages_from_channel(
 
 @message_controllers.delete(**response_data.get('delete_message'))
 async def delete_message(
-        message_id: int, session=Depends(get_db_session),
+        message_id: int,
+        presenter=Depends(get_presenter),
         customer=Depends(
             CustomerPermission(token_service=TokenService()).get_current_user)
 ):
-    presenter = MessagePresenter(MessageRepositories(session=session))
     await presenter \
         .delete_message(message_id=message_id, customer_id=customer.id)
 
@@ -53,11 +53,10 @@ async def delete_message(
 @message_controllers.get(**response_data.get('get_message'))
 async def get_message(
         message_id: int,
-        session=Depends(get_db_session),
+        presenter=Depends(get_presenter),
         customer=Depends(
             CustomerPermission(token_service=TokenService()).get_current_user)
 ):
-    presenter = MessagePresenter(MessageRepositories(session=session))
     return await presenter \
         .get_message(message_id=message_id, customer_id=customer.id)
 
@@ -68,12 +67,11 @@ async def chat(
         websocket: WebSocket,
         limit: int = 20,
         offset: int = 0,
-        session=Depends(get_db_session),
+        presenter=Depends(get_presenter),
         customer=Depends(
             CustomerPermission(token_service=TokenService())
             .jwt_websocket_current_user)
 ):
-    presenter = MessagePresenter(MessageRepositories(session=session))
     sender_customer = customer
     channel = await get_channel(channel_slug=channel_slug)
     if channel is None:
