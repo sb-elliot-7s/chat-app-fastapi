@@ -42,8 +42,28 @@ class MessageSearchElastic(MessageSearchElasticInterface):
             .query('match', text=options.text)
         if options.channel_id:
             searched = searched.filter('term', channel_id=options.channel_id)
-        response: Response = searched.execute()
-        return response
+        if options.from_date or options.to_date:
+            searched = self.date_filter(
+                from_date=options.from_date, to_date=options.to_date,
+                searched=searched
+            )
+        return searched.execute()
+
+    @staticmethod
+    def range_date_filter(searched, filter_date):
+        return searched.filter('range', **{'created': filter_date})
+
+    def date_filter(self, from_date, to_date, searched):
+        from_and_to_date = {
+            'searched': searched,
+            'filter_date': {'gte': from_date, 'lte': to_date}
+        }
+        to_date_ = {'searched': searched, 'filter_date': {'lte': to_date}}
+        from_date_ = {'searched': searched, 'filter_date': {'gte': from_date}}
+        return self.range_date_filter(
+            **from_and_to_date) if from_date and to_date \
+            else self.range_date_filter(**to_date_) if not from_date \
+            else self.range_date_filter(**from_date_)
 
 
 class MessageElasticService:

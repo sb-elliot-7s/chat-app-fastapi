@@ -19,6 +19,8 @@ class MessageImageSchema(BaseModel):
 class SearchMessageSchema(BaseModel):
     channel_id: int | None
     text: str
+    from_date: datetime | None
+    to_date: datetime | None
 
 
 class UpdateMessageSchema(SearchMessageSchema):
