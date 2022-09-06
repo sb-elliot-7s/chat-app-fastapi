@@ -32,7 +32,7 @@ class ElasticClient:
         document.init(using=self.client)
 
 
-class MessageSearchElastic(MessageSearchElasticInterface):
+class MessageSearchElasticService(MessageSearchElasticInterface):
     def __init__(self, client, index: str = 'message'):
         self.index = index
         self.client = client

@@ -3,24 +3,23 @@ from permissions import CustomerPermission
 from customers.auth.token_service import TokenService
 from .states import StateHandler
 from .utils import last_messages, get_channel
-from .deps import response_data, get_presenter, get_message_search_presenter
+from .deps import response_data, get_presenter, get_message_search_presenter, \
+    get_message_elastic_service
 from .schemas import SearchMessageSchema
-from .elastic_client import MessageSearchElastic, ElasticClient
-from settings import get_settings
 from .presenter import MessageSearchPresenter
 
 message_controllers = APIRouter(prefix='/messages', tags=['messages'])
 
 
-@message_controllers.post('/search')
+@message_controllers.post(**response_data.get('search'))
 def search_messages(
         options: SearchMessageSchema,
+        elastic_receiver=Depends(get_message_elastic_service),
         search_presenter: MessageSearchPresenter = Depends(
             get_message_search_presenter)
 ):
-    es_client = ElasticClient(hosts=get_settings().elastic_host).client
-    receiver = MessageSearchElastic(client=es_client)
-    return search_presenter.search_messages(options=options, receiver=receiver)
+    return search_presenter \
+        .search_messages(options=options, receiver=elastic_receiver)
 
 
 @message_controllers.get(**response_data.get('my_messages_from_channels'))

@@ -23,7 +23,7 @@ class SearchMessageSchema(BaseModel):
     to_date: datetime | None
 
 
-class UpdateMessageSchema(SearchMessageSchema):
+class UpdateMessageSchema(BaseModel):
     text: str
 
 
