@@ -32,7 +32,8 @@ class MessageRepositories(MessageRepositoriesInterface):
         await self.session.commit()
         return result.mappings().first()
 
-    async def __check_user_subscribed(self, channel_id: int, customer_id: int):
+    @staticmethod
+    async def __check_user_subscribed(channel_id: int, customer_id: int):
         result = await check_user_in_subscribes(
             customer_id=customer_id, channel_id=channel_id)
         if not result:
