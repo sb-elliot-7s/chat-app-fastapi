@@ -25,7 +25,7 @@ response_data = {
         'status_code': status.HTTP_201_CREATED
     },
     'unsubscribe': {
-        'path': '/unsubscribe/{channel_slug}',
+        'path': '/unsubscribe/{channel_id}',
         'status_code': status.HTTP_204_NO_CONTENT
     },
     'channels': {
