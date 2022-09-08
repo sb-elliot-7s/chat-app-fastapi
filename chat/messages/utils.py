@@ -50,13 +50,11 @@ async def create_channel(
     return await handler(**data)
 
 
-async def check_user_in_subscribes(
-        customer_id: int, channel_id: int, token: str):
+async def check_user_in_subscribes(customer_id: int, channel_id: int):
     data = {
         'url': f'/channels/check-user/{customer_id}/channel/{channel_id}',
         'method': METHOD.GET.value,
         'status_code': 200,
-        'headers': {'AUTHORIZATION': f'bearer {token}'}
     }
     return await handler(**data)
 

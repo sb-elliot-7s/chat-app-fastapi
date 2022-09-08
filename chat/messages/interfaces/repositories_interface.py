@@ -16,7 +16,7 @@ class MessageRepositoriesInterface(ABC):
     @abstractmethod
     async def get_messages(
             self, channel_id: int, customer_id: int | None, limit: int,
-            offset: int
+            offset: int, is_chat: bool = True
     ):
         pass
 

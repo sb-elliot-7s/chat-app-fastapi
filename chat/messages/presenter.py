@@ -24,11 +24,11 @@ class MessagePresenter:
 
     async def get_messages(
             self, channel_id: int, customer_id: int | None, limit: int,
-            offset: int
+            offset: int, is_chat: bool = True
     ):
         return await self.repository.get_messages(
             channel_id=channel_id, customer_id=customer_id, limit=limit,
-            offset=offset
+            offset=offset, is_chat=is_chat
         )
 
     async def get_message(self, message_id: int, customer_id: int):

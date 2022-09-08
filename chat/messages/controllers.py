@@ -6,7 +6,7 @@ from .utils import last_messages, get_channel
 from .deps import response_data, get_presenter, get_message_search_presenter, \
     get_message_elastic_service
 from .schemas import SearchMessageSchema
-from .presenter import MessageSearchPresenter
+from .presenter import MessageSearchPresenter, MessagePresenter
 
 message_controllers = APIRouter(prefix='/messages', tags=['messages'])
 
@@ -25,7 +25,7 @@ def search_messages(
 @message_controllers.get(**response_data.get('my_messages_from_channels'))
 async def my_messages_from_channel(
         channel_id: int,
-        presenter=Depends(get_presenter),
+        presenter: MessagePresenter = Depends(get_presenter),
         limit: int = 20, offset: int = 0,
         customer=Depends(
             CustomerPermission(token_service=TokenService()).get_current_user)
@@ -34,7 +34,8 @@ async def my_messages_from_channel(
         channel_id=channel_id,
         customer_id=customer.id,
         limit=limit,
-        offset=offset
+        offset=offset,
+        is_chat=False
     )
 
 

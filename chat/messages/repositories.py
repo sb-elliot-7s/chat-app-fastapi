@@ -9,6 +9,8 @@ from .models import Message
 from .interfaces.repositories_interface import \
     MessageRepositoriesInterface, MessageSearchInterface
 from .interfaces.elastic_message_interface import MessageSearchElasticInterface
+from .utils import check_user_in_subscribes
+from .exceptions import MessageExceptions
 
 
 @dataclass
@@ -30,15 +32,22 @@ class MessageRepositories(MessageRepositoriesInterface):
         await self.session.commit()
         return result.mappings().first()
 
+    async def __check_user_subscribed(self, channel_id: int, customer_id: int):
+        result = await check_user_in_subscribes(
+            customer_id=customer_id, channel_id=channel_id)
+        if not result:
+            raise MessageExceptions().not_subscribed_to_the_channel
+
     async def get_messages(
             self, channel_id: int, customer_id: int | None, limit: int,
-            offset: int
+            offset: int, is_chat: bool = True
     ):
+        if not is_chat:
+            await self.__check_user_subscribed(channel_id, customer_id)
         stmt = select(Message)
         if customer_id:
             stmt = stmt.where(Message.from_customer_id == customer_id)
-        stmt = stmt \
-            .where(Message.channel_id == channel_id) \
+        stmt = stmt.where(Message.channel_id == channel_id) \
             .limit(limit) \
             .offset(offset) \
             .order_by(Message.updated.desc())

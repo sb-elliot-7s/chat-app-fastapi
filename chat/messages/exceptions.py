@@ -14,3 +14,10 @@ class MessageExceptions:
             'type': 'error',
             'text': 'You must first subscribe to the channel'
         }
+
+    @property
+    def not_subscribed_to_the_channel(self):
+        return HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You are not subscribed to this channel"
+        )

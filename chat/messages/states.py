@@ -81,7 +81,7 @@ class StateHandler:
                 if not await check_user_in_subscribes(
                         customer_id=sender_customer.id,
                         channel_id=channel['id'],
-                        token=self.websocket.headers.get('token')):
+                ):
                     error: dict = MessageExceptions().not_subscribe_error
                     await self.websocket.send_json(data=error)
                 else:
