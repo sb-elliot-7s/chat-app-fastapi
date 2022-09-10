@@ -80,7 +80,7 @@ class StateHandler:
             case MessageType.CHAT.value:
                 if not await check_user_in_subscribes(
                         customer_id=sender_customer.id,
-                        channel_id=channel['id'],
+                        channel_id=channel['id']
                 ):
                     error: dict = MessageExceptions().not_subscribe_error
                     await self.websocket.send_json(data=error)
