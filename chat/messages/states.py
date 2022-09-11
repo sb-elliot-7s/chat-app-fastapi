@@ -58,8 +58,7 @@ class StateHandler:
         message: dict = await self.presenter.save_message(
             from_customer_id=sender_id,
             message_data=CreateMessageSchema(
-                text=text, to_customer_id=receiver_id
-            ),
+                text=text, to_customer_id=receiver_id),
             channel_id=channel_id
         )
         self.save_message_to_elastic(message=message)

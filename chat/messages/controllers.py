@@ -84,9 +84,9 @@ async def chat(
     await websocket.send_json(data=messages)
     try:
         while True:
-            obj_data: dict = await websocket.receive_json()
+            json_data: dict = await websocket.receive_json()
             await StateHandler(websocket=websocket, presenter=presenter) \
-                .check_handle(obj_data=obj_data, channel=channel,
+                .check_handle(obj_data=json_data, channel=channel,
                               sender_customer=sender_customer)
     except WebSocketDisconnect:
         ...
