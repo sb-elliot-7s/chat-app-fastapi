@@ -1,9 +1,7 @@
 from dataclasses import dataclass
-
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncResult
 from sqlalchemy import select, insert, delete, update
 from sqlalchemy.orm import subqueryload
-
 from .schemas import CreateChannelSchema, UpdateChannelSchema
 from .models import Channel, Subscribers
 from .exceptions import ChannelExceptions
@@ -29,19 +27,19 @@ class ChannelRepositories(ChannelRepositoriesInterface):
 
     async def create_channel(
             self, customer_id: int, channel_data: CreateChannelSchema):
-        stmt = insert(Channel).values(
-            owner_id=customer_id,
-            slug=channel_data.channel_name,
-            **channel_data.dict()
-        ).returning(Channel)
+        values = {
+            'owner_id': customer_id,
+            'slug': channel_data.channel_name,
+            **channel_data.dict(exclude_none=True)
+        }
+        stmt = insert(Channel).values(**values).returning(Channel)
         result = await self.session.execute(statement=stmt)
         await self.session.commit()
         return result.first()
 
     async def delete_channel(self, customer_id: int, channel_slug: str):
-        stmt = delete(Channel) \
-            .where(Channel.owner_id == customer_id,
-                   Channel.slug == channel_slug)
+        cond = (Channel.owner_id == customer_id, Channel.slug == channel_slug)
+        stmt = delete(Channel).where(*cond)
         result = await self.session.execute(statement=stmt)
         await self.session.commit()
         return result.rowcount
@@ -50,13 +48,13 @@ class ChannelRepositories(ChannelRepositoriesInterface):
             self, customer_id: int, channel_slug: str,
             updated_data: UpdateChannelSchema
     ):
-        stmt = update(Channel) \
-            .where(Channel.slug == channel_slug,
-                   Channel.owner_id == customer_id).values(
-            slug=updated_data.channel_name,
-            **updated_data.dict(exclude_none=True)
-        )
-        _ = await self.session.execute(statement=stmt)
+        await self.__check_channel(channel_slug=channel_slug)
+        values = {**updated_data.dict(exclude_none=True)}
+        if updated_data.channel_name:
+            values.update({'slug': updated_data.channel_name})
+        cond = (Channel.slug == channel_slug, Channel.owner_id == customer_id)
+        stmt = update(Channel).where(*cond).values(**values)
+        await self.session.execute(statement=stmt)
         await self.session.commit()
 
     async def get_channel(self, channel_slug: str):
@@ -74,16 +72,15 @@ class ChannelRepositories(ChannelRepositoriesInterface):
 
     async def subscribe(self, customer_id: int, channel_slug: str):
         channel = await self.__check_channel(channel_slug=channel_slug)
-        subs_stmt = insert(Subscribers) \
-            .values(customer_id=customer_id, channel_id=channel.id)
+        values = {'customer_id': customer_id, 'channel_id': channel.id}
+        subs_stmt = insert(Subscribers).values(**values)
         _ = await self.session.execute(statement=subs_stmt)
         await self.session.commit()
 
     async def unsubscribe(self, customer_id: int, channel_id: int):
-        channel_subs_stmt = delete(Subscribers).where(
-            Subscribers.channel_id == channel_id,
-            Subscribers.customer_id == customer_id
-        )
+        cond = (Subscribers.channel_id == channel_id,
+                Subscribers.customer_id == customer_id)
+        channel_subs_stmt = delete(Subscribers).where(*cond)
         result = await self.session.execute(statement=channel_subs_stmt)
         await self.session.commit()
         return result.rowcount
@@ -96,4 +93,4 @@ class ChannelRepositories(ChannelRepositoriesInterface):
             .where(Subscribers.channel_id == channel_id,
                    Subscribers.customer_id == customer_id)
         result: AsyncResult = await self.session.execute(statement=exists_stmt)
-        return True if result.scalars().first() else False
+        return result.scalars().first() is not None

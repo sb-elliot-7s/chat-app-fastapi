@@ -10,19 +10,17 @@ class ChannelPresenter:
     repository: ChannelRepositoriesInterface
 
     async def get_channels(self, customer_id: int, limit: int, offset: int):
-        return await self.repository \
-            .get_channels(customer_id=customer_id, limit=limit, offset=offset)
+        data = {'customer_id': customer_id, 'limit': limit, 'offset': offset}
+        return await self.repository.get_channels(**data)
 
     async def create_channel(
-            self, customer_id: int, channel_data: CreateChannelSchema
-    ):
-        return await self.repository \
-            .create_channel(customer_id=customer_id, channel_data=channel_data)
+            self, customer_id: int, channel_data: CreateChannelSchema):
+        data = {'customer_id': customer_id, 'channel_data': channel_data}
+        return await self.repository.create_channel(**data)
 
     async def delete_channel(self, customer_id: int, channel_slug: str):
-        result = await self.repository \
-            .delete_channel(customer_id=customer_id, channel_slug=channel_slug)
-        if not result:
+        data = {'customer_id': customer_id, 'channel_slug': channel_slug}
+        if not await self.repository.delete_channel(**data):
             raise ChannelExceptions().channel_not_found
 
     async def update_channel(
@@ -34,24 +32,21 @@ class ChannelPresenter:
                             updated_data=updated_data)
 
     async def get_channel(self, channel_slug: str):
-        result = await self.repository.get_channel(channel_slug=channel_slug)
-        if result is None:
+        data = {'channel_slug': channel_slug}
+        if (result := await self.repository.get_channel(**data)) is None:
             raise ChannelExceptions().channel_not_found
         return result
 
     async def subscribe(self, customer_id: int, channel_slug: str):
-        return await self.repository \
-            .subscribe(customer_id=customer_id, channel_slug=channel_slug)
+        data = {'customer_id': customer_id, 'channel_slug': channel_slug}
+        return await self.repository.subscribe(**data)
 
     async def unsubscribe(self, customer_id: int, channel_id: int):
-        result = await self.repository \
-            .unsubscribe(customer_id=customer_id, channel_id=channel_id)
-        if not result:
-            raise ChannelExceptions() \
-                .unsubscribe(customer_id=customer_id, channel_id=channel_id)
+        data = {'customer_id': customer_id, 'channel_id': channel_id}
+        if not await self.repository.unsubscribe(**data):
+            raise ChannelExceptions.unsubscribe(**data)
 
     async def check_if_user_in_subscribed(
             self, customer_id: int, channel_id: int):
-        return await self.repository.check_if_user_in_subscribed(
-            customer_id=customer_id, channel_id=channel_id
-        )
+        data = {'customer_id': customer_id, 'channel_id': channel_id}
+        return await self.repository.check_if_user_in_subscribed(**data)
