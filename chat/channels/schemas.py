@@ -13,6 +13,9 @@ class UpdateChannelSchema(BaseModel):
     channel_name: str | None = Field(None, max_length=200)
     describe_info: str | None = Field(None, max_length=255)
 
+    @property
+    def is_empty(self): return not self.dict(exclude_none=True)
+
 
 class ChannelSchema(CreateChannelSchema):
     id: int
@@ -22,7 +25,6 @@ class ChannelSchema(CreateChannelSchema):
 
     online_customers: list[CustomerSchema]
     subscribers: list[CustomerSchema]
-    # messages: list | None
 
     class Config:
         orm_mode = True
