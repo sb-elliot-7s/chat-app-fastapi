@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-
 from fastapi import UploadFile
 import aiofiles
 from aiofiles import os as _os
@@ -22,13 +21,15 @@ class ImageService(ImageServiceInterface):
 
     @file_not_found
     async def write_image(self, file: UploadFile, filename: str):
-        async with aiofiles.open(file=f'{self.path}/{filename}', mode='wb') as f:
+        _filename = f'{self.path}/{filename}'
+        async with aiofiles.open(file=_filename, mode='wb') as f:
             raw = await file.read()
             await f.write(raw)
 
     @file_not_found
     async def read_image(self, filename: str):
-        async with aiofiles.open(file=f'{self.path}/{filename}', mode='r') as file:
+        _filename = f'{self.path}/{filename}'
+        async with aiofiles.open(file=_filename, mode='r') as file:
             return await file.read()
 
     @file_not_found
