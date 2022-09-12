@@ -27,6 +27,8 @@ class ChannelPresenter:
             self, customer_id: int, channel_slug: str,
             updated_data: UpdateChannelSchema
     ):
+        if updated_data.is_empty:
+            raise ChannelExceptions().empty_data
         return await self.repository \
             .update_channel(customer_id=customer_id, channel_slug=channel_slug,
                             updated_data=updated_data)

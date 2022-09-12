@@ -48,8 +48,6 @@ class ChannelRepositories(ChannelRepositoriesInterface):
             self, customer_id: int, channel_slug: str,
             updated_data: UpdateChannelSchema
     ):
-        if updated_data.is_empty:
-            raise ChannelExceptions().empty_data
         await self.__check_channel(channel_slug=channel_slug)
         values = {**updated_data.dict(exclude_none=True)}
         if updated_data.channel_name:
