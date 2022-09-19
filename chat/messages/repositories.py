@@ -61,10 +61,9 @@ class MessageRepositories(MessageRepositoriesInterface):
         return result.scalars().first()
 
     async def delete_message(self, message_id: int, customer_id: int):
-        stmt = delete(Message).where(
-            Message.id == message_id,
-            Message.from_customer_id == customer_id
-        )
+        cond = (Message.id == message_id,
+                Message.from_customer_id == customer_id)
+        stmt = delete(Message).where(*cond)
         result = await self.session.execute(statement=stmt)
         await self.session.commit()
         return result.rowcount
@@ -73,9 +72,10 @@ class MessageRepositories(MessageRepositoriesInterface):
             self, message_id: int, customer_id: int,
             updated_data: UpdateMessageSchema
     ):
+        cond = (Message.id == message_id,
+                Message.from_customer_id == customer_id)
         stmt = update(Message) \
-            .where(Message.id == message_id,
-                   Message.from_customer_id == customer_id) \
+            .where(*cond) \
             .values(**updated_data.dict()) \
             .returning(Message)
         result: AsyncResult = await self.session.execute(statement=stmt)
