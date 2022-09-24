@@ -1,15 +1,14 @@
 import uuid
 from dataclasses import dataclass
-
 from fastapi import UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete, insert
-
-from image_service.interfaces.image_service_interface import ImageServiceInterface
+from image_service.interfaces.image_service_interface import \
+    ImageServiceInterface
 from ..auth.models import Customers, CustomerImage
 from .schemas import UpdateCustomerSchema
-
-from .interfaces.profile_repositories_interface import ProfileRepositoriesInterface
+from .interfaces.profile_repositories_interface import \
+    ProfileRepositoriesInterface
 from .exceptions import ProfileExceptions
 import aiohttp
 from settings import get_settings
@@ -38,9 +37,9 @@ class ProfileRepositories(ProfileRepositoriesInterface):
             image_service: ImageServiceInterface
     ):
         await image_service.delete_image(filename=image_name)
-        stmt = delete(CustomerImage) \
-            .where(CustomerImage.photo == image_name,
-                   CustomerImage.customer_id == customer_id)
+        cond = (CustomerImage.photo == image_name,
+                CustomerImage.customer_id == customer_id)
+        stmt = delete(CustomerImage).where(*cond)
         await self.session.execute(statement=stmt)
         await self.session.commit()
 
@@ -53,7 +52,8 @@ class ProfileRepositories(ProfileRepositoriesInterface):
         if username:
             username_stmt = select(Customers.id) \
                 .where(Customers.username == username)
-            check_customer = await self.session.execute(statement=username_stmt)
+            check_customer = await self.session \
+                .execute(statement=username_stmt)
             if check_customer.first():
                 raise ProfileExceptions().username_exists
 
@@ -68,7 +68,8 @@ class ProfileRepositories(ProfileRepositoriesInterface):
                 if response.status == 201:
                     return await response.json()
 
-    async def update_customer(self, customer_id: int, data: UpdateCustomerSchema):
+    async def update_customer(self, customer_id: int,
+                              data: UpdateCustomerSchema):
         await self.__check_username_exists(username=data.username)
         upd_stmt = update(Customers) \
             .where(Customers.id == customer_id) \
